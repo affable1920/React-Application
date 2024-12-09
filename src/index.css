@@ -1,0 +1,41 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  font-family: "Alegreya Sans", "Franklin Gothic Medium", "Arial Narrow", Arial,
+    sans-serif;
+}
+
+a {
+  text-decoration: none;
+}
+
+html,
+body {
+  height: 100%;
+  width: 100vw;
+}
+
+#root {
+  display: grid;
+  height: 100%;
+  grid-template-areas: "header header" "main main" "footer footer";
+  grid-template-rows: 45px auto 50px;
+}
+
+#page-header {
+  box-shadow: 0 0 1px 2px #eee;
+  grid-area: header;
+}
+
+main {
+  grid-area: main;
+}
+
+#footer {
+  text-align: center;
+  grid-area: footer;
+  background: #222;
+  box-shadow: 0 0 4px 1px #222;
+  grid-column: 1 / -1;
+}
