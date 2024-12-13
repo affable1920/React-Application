@@ -1,11 +1,14 @@
 import React from "react";
-import TableHeader from "./TableHeader";
 import TableBody from "./TableBody";
 
-const TaskTable = () => {
+const TaskTable = ({ pages }) => {
   return (
     <>
-      <TableBody />
+      {pages?.map((page) => (
+        <React.Fragment>
+          <TableBody page={page} />
+        </React.Fragment>
+      ))}
     </>
   );
 };

@@ -6,7 +6,7 @@ const ResetButton = ({ onReset }) => {
   return (
     <button
       onClick={onReset}
-      disabled={tasks.length === 0}
+      disabled={tasks?.length === 0}
       className="btn btn-primary"
     >
       ~

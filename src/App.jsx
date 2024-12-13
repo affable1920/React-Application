@@ -1,19 +1,18 @@
 import { useEffect, useState } from "react";
-import { Route, Routes, NavLink } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import { onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { getDoc, doc } from "firebase/firestore";
+import useCustomQuery from "./hooks/useQuery";
 import auth from "./services/auth";
 import useTasks from "./hooks/useTask";
 import TaskContext from "./context/taskContext";
 import UserContext from "./context/UserContext";
 import AddComponent from "./components/AddComponent";
 import Tasks from "./components/Tasks";
-import InformationComponent from "./components/InformationComponent";
 import TaskComponent from "./components/TaskComponent";
 import NavBar from "./components/NavBar";
 import AlertTasks from "./components/AlertTasks";
-import Portal from "./components/Portal";
 import LoginForm from "./components/LoginForm";
 import RegisterForm from "./components/RegisterForm";
 import Logout from "./components/Logout";
@@ -22,12 +21,9 @@ import TeamComponent from "./components/TeamComponent";
 import TeamForm from "./components/TeamForm";
 import "react-toastify/ReactToastify.css";
 import "./App.css";
-import useCustomQuery from "./hooks/useQuery";
 
 function App() {
   const {
-    tasks,
-    paginatedTasks,
     currentPage,
     pageSize,
     selectedStatus,
@@ -48,8 +44,17 @@ function App() {
     handlePriority,
   } = useTasks();
 
-  const { data, error, isLoading } = useCustomQuery();
-  console.log(data);
+  const [query, setQuery] = useState({ pageSize });
+
+  const {
+    data,
+    error,
+    isLoading,
+    refetch,
+    fetchNextPage,
+    isFetchingNextPage,
+    hasNextPage,
+  } = useCustomQuery(query);
 
   let unfinishedTasksMessage =
     "You have some unifinished tasks that are older than a week !";
@@ -65,34 +70,34 @@ function App() {
     return daysPassed >= 7;
   };
 
-  const unfinishedTasks = tasks.filter(
-    ({ completed, history }) =>
-      completed === false &&
-      isOlderThanAWeek(
-        `${history.creation.timeStamp}${new Date().getFullYear()}`
-      )
-  );
-  const highPriorityTasks = tasks.filter(
-    (task) => task.priority.toLowerCase() === "high"
-  );
+  // const unfinishedTasks = tasks?.filter(
+  //   ({ completed, history }) =>
+  //     completed === false &&
+  //     isOlderThanAWeek(
+  //       `${history?.creation?.timeStamp}${new Date().getFullYear()}`
+  //     )
+  // );
+  // const highPriorityTasks = tasks?.filter(
+  //   (task) => task.priority.toLowerCase() === "high"
+  // );
 
   const [currentUser, setCurrentUser] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const [portalMessage, setPortalMessage] = useState("");
 
-  useEffect(() => {
-    let message = "";
-    if (unfinishedTasks.length !== 0) message = unfinishedTasksMessage;
-    if (highPriorityTasks.length !== 0) message = highPriorityTasksMessage;
-    if (highPriorityTasks.length !== 0 && unfinishedTasks.length !== 0)
-      message = generalAlert;
+  // useEffect(() => {
+  //   let message = "";
+  //   if (unfinishedTasks?.length !== 0) message = unfinishedTasksMessage;
+  //   if (highPriorityTasks?.length !== 0) message = highPriorityTasksMessage;
+  //   if (highPriorityTasks?.length !== 0 && unfinishedTasks?.length !== 0)
+  //     message = generalAlert;
 
-    if (message) {
-      setIsOpen(true);
-      setPortalMessage(message);
-      localStorage.setItem("modalIsOpen", true);
-    }
-  }, []);
+  //   if (message) {
+  //     setIsOpen(true);
+  //     setPortalMessage(message);
+  //     localStorage.setItem("modalIsOpen", true);
+  //   }
+  // }, []);
 
   useEffect(() => {
     const cleanUp = onAuthStateChanged(auth.authInstance, async (user) => {
@@ -115,36 +120,40 @@ function App() {
     setPortalMessage("");
   };
 
-  const renderAlertTasks = () => {
-    let tasksToRender = [];
+  // const renderAlertTasks = () => {
+  //   let tasksToRender = [];
 
-    if (unfinishedTasks.length > 0) tasksToRender = unfinishedTasks;
-    if (highPriorityTasks.length > 0) tasksToRender = highPriorityTasks;
-    if (highPriorityTasks.length > 0 && unfinishedTasks.length > 0) {
-      const combinedTasks = [...highPriorityTasks, ...unfinishedTasks];
-      tasksToRender = combinedTasks.filter(
-        (task, index, self) => index === self.findIndex((t) => t.id === task.id)
-      );
-    }
-    return tasksToRender;
+  //   if (unfinishedTasks?.length > 0) tasksToRender = unfinishedTasks;
+  //   if (highPriorityTasks?.length > 0) tasksToRender = highPriorityTasks;
+  //   if (highPriorityTasks?.length > 0 && unfinishedTasks.length > 0) {
+  //     const combinedTasks = [...highPriorityTasks, ...unfinishedTasks];
+  //     tasksToRender = combinedTasks?.filter(
+  //       (task, index, self) =>
+  //         index === self.findIndex((t) => t.id === task?.id)
+  //     );
+  //   }
+  //   return tasksToRender;
+  // };
+
+  const setQueryPriority = () => {
+    if (!query.priority || query?.priority === "Low")
+      setQuery({ ...query, priority: "High" });
+    else setQuery({ ...query, priority: "Low" });
   };
 
   return (
     <>
-      <Portal open={isOpen} onClose={handleClose}>
+      {/* <Portal open={isOpen} onClose={handleClose}>
         <NavLink to="/tasks/alert">
           <button id="btn-modal" className="btn btn-primary">
             Check these tasks
           </button>
         </NavLink>
-      </Portal>
+      </Portal> */}
       <UserContext.Provider value={{ user: currentUser }}>
         <NavBar />
         <TaskContext.Provider
           value={{
-            tasks,
-            paginatedTasks,
-            alertTasks: unfinishedTasks,
             currentPage,
             pageSize,
             status: selectedStatus,
@@ -171,12 +180,26 @@ function App() {
                 path="/add"
                 element={<AddComponent onTaskAdd={handleTaskAdd} />}
               />
-              <Route path="/" exact element={<Tasks onReset={handleReset} />} />
-              <Route path="/task/:id" Component={TaskComponent} />
               <Route
-                path="/tasks/:alert"
-                element={<AlertTasks tasks={renderAlertTasks()} />}
+                path="/"
+                exact
+                element={
+                  <Tasks
+                    onSort={setQueryPriority}
+                    constraint={query}
+                    onSelectQuery={(c) => {
+                      setQuery({ ...query, [c]: c });
+                    }}
+                    onReset={handleReset}
+                    pages={data?.pages}
+                    onLoad={fetchNextPage}
+                    isFetchingNextPage={isFetchingNextPage}
+                    hasNextPage={hasNextPage}
+                  />
+                }
               />
+              <Route path="/task/:id" Component={TaskComponent} />
+              <Route path="/tasks/:alert" element={<AlertTasks />} />
 
               <Route path="/register" Component={RegisterForm} />
               <Route path="/login" Component={LoginForm} />
@@ -187,7 +210,7 @@ function App() {
             </Routes>
             <ToastContainer />
           </main>
-          <InformationComponent tasks={tasks} alertTasks={renderAlertTasks()} />
+          {/* <InformationComponent tasks={tasks} alertTasks={renderAlertTasks()} /> */}
         </TaskContext.Provider>
       </UserContext.Provider>
     </>

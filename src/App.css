@@ -264,7 +264,7 @@ ul.user-routes {
   grid-template-columns: repeat(2, 1fr);
   grid-template-rows: auto;
   margin: var(--var--margin-less);
-  gap: 1rem;
+  gap: 2rem;
 }
 
 .alert-box {
@@ -333,17 +333,28 @@ ul.user-routes {
 
 .task-buttons {
   grid-row: 2 / 2;
-  grid-column: 1 / 3;
+  grid-column: 1 / -1;
   display: flex;
-  gap: 2rem;
-  height: 2.2rem;
-  max-height: 2.2rem;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-right: 1rem;
+  align-items: center;
 }
 
 .tasks {
-  margin: 3rem var(--var--margin-more);
+  margin: 1.4rem var(--var--margin-more);
   display: grid;
   grid-template-columns: repeat(autofit, minmax(200px, 1fr));
+  position: relative;
+}
+
+.task-footer-btns {
+  position: absolute;
+  bottom: -2%;
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  padding: 0 1.3rem;
 }
 
 .tasks-container {
@@ -366,6 +377,7 @@ ul.user-routes {
   gap: 1rem;
   grid-template-columns: 100%;
   grid-template-rows: auto;
+  margin-bottom: 1rem;
 }
 
 #task-row {
@@ -560,6 +572,32 @@ ul.user-routes {
   margin: 0;
 }
 
+.btn-infinite {
+  position: absolute;
+  top: 95%;
+  left: 85%;
+  transform: translate(-50%, -50%);
+}
+
+.sorters {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
+}
+
+.sort-btn {
+  align-self: center;
+  cursor: pointer;
+}
+
+.sort-select select {
+  border: none;
+  outline: none;
+  box-shadow: 0 0 10px 2px #eee;
+  cursor: pointer;
+}
+
 @media screen and (min-width: 968px) {
   .flex-nav {
     gap: 3rem;
@@ -582,6 +620,9 @@ ul.user-routes {
   }
   #add-task-btn {
     margin-top: 0.5rem;
+  }
+  .task-footer-btns {
+    bottom: -7.5%;
   }
 }
 

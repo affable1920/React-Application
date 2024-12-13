@@ -8,7 +8,7 @@ const SearchBar = () => {
     setSearchQuery(e.target.value);
   };
 
-  if (tasks.length <= 1) return null;
+  if (tasks?.length <= 1) return null;
   return (
     <div id="search-bar">
       <input

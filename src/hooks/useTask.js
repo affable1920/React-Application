@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import { toast } from "react-toastify";
 import paginate from "./../services/paginate";
 import { months } from "../services/date-timer-service";
-import { doc, setDoc } from "firebase/firestore";
+import { deleteDoc, doc, setDoc, updateDoc } from "firebase/firestore";
 import auth from "../services/auth";
 
 const useTasks = () => {
@@ -39,8 +39,6 @@ const useTasks = () => {
       setPageSize(window.innerWidth < 768 ? 7 : 16);
       setCurrentPage(1);
     };
-    const tasks = JSON.parse(localStorage.getItem("tasks"));
-    if (tasks) setTasks(tasks);
 
     updatedPageSize();
     window.addEventListener("resize", updatedPageSize);
@@ -117,7 +115,7 @@ const useTasks = () => {
     };
     const newTasks = [...tasks, { ...taskToAdd }];
     setTasks(newTasks);
-    localStorage.setItem("tasks", JSON.stringify(newTasks));
+    setDoc(doc(auth.database, "tasks", taskToAdd.id), taskToAdd);
   };
 
   const handleChecBoxChange = useCallback((e, task) => {
@@ -146,12 +144,16 @@ const useTasks = () => {
         : t
     );
     setTasks(updatedTasks);
+    updateDoc(doc(auth.database, "tasks", task?.id), {
+      completed: e.target.checked,
+    });
     localStorage.setItem("tasks", JSON.stringify(updatedTasks));
   });
 
   const handleDelete = (task) => {
     const updatedTasks = tasks.filter((t) => t.id !== task.id);
     setTasks(updatedTasks);
+    deleteDoc(doc(auth.database, "tasks", task?.id));
     localStorage.setItem("tasks", JSON.stringify(updatedTasks));
   };
 
@@ -185,9 +187,9 @@ const useTasks = () => {
   const handleTimerClick = (taskId) => {
     const clickedTask = tasks.find((task) => task.id === taskId);
     setCurrentTask((prevVal) => {
-      if (prevVal === null || (prevVal.id && prevVal.id !== taskId))
+      if (prevVal === null || (prevVal?.id && prevVal?.id !== taskId))
         return clickedTask;
-      if (prevVal.id && prevVal.id === taskId) return null;
+      if (prevVal?.id && prevVal?.id === taskId) return null;
     });
   };
 
@@ -199,29 +201,27 @@ const useTasks = () => {
     let timeInS = eval(times);
     const timeInMs = timeInS * 1000;
 
-    const updatedTasks = tasks.map((t) =>
-      t.id === task.id
-        ? {
-            ...t,
-            timerState: {
-              ...t.timerState,
-              isActive: true,
-              createdAt: renderCreationTime(),
-              endsAt: renderTimerEndTime(timeInMs),
-              remainingTime: timeInS,
-            },
-            history: {
-              ...t.history,
-              events: [
-                ...t.history.events,
-                { name: event.name, timeStamp: renderCreationTime() },
-              ],
-            },
-          }
-        : t
-    );
+    const updatedTask = {
+      ...task,
+      timerState: {
+        ...task.timerState,
+        isActive: true,
+        createdAt: renderCreationTime(),
+        endsAt: renderTimerEndTime(timeInMs),
+        remainingTime: timeInS,
+      },
+      history: {
+        ...task.history,
+        events: [
+          ...task.history.events,
+          { name: event.name, timeStamp: renderCreationTime() },
+        ],
+      },
+    };
+
+    const updatedTasks = tasks.map((t) => (t.id === task.id ? updatedTask : t));
     setTasks(updatedTasks);
-    localStorage.setItem("tasks", JSON.stringify(updatedTasks));
+    updateDoc(doc(auth.database, "tasks", task.id), updatedTask);
     createNotification(`Timer set for '${task.title}'`);
 
     let timeOut = setTimeout(() => {
@@ -240,7 +240,14 @@ const useTasks = () => {
           : t
       );
       setTasks(updatedTasks);
-      localStorage.setItem("tasks", JSON.stringify(updatedTasks));
+      updateDoc(doc(auth.database, "tasks", task.id), {
+        timerState: {
+          isActive: false,
+          createdAt: tns,
+          endsAt: tns,
+          remainingTime: tns,
+        },
+      });
       createNotification("Time Up");
     }, timeInMs);
     return () => clearTimeout(timeOut);
@@ -276,7 +283,6 @@ const useTasks = () => {
         : t
     );
     setTasks(updatedTasks);
-    localStorage.setItem("tasks", JSON.stringify(updatedTasks));
     createNotification(`Timer for '${task.title}' cancelled`);
   };
 
@@ -293,7 +299,6 @@ const useTasks = () => {
       },
     }));
     setTasks(resettedTasks);
-    localStorage.setItem("tasks", JSON.stringify(resettedTasks));
     createNotification("All timers Reset");
   };
 
@@ -326,29 +331,25 @@ const useTasks = () => {
     if (minutes > 0) timeLeft.push(`${minutes} minutes`);
     if (seconds > 0) timeLeft.push(`${seconds} seconds`);
 
-    const updatedTasks = tasks.map((t) =>
-      t.id === task.id
-        ? {
-            ...t,
-            timerState: {
-              ...t.timerState,
-              isActive: true,
-              createdAt: renderCreationTime(),
-              endsAt: targetDate.toLocaleString(),
-              remainingTime: totalSeconds,
-            },
-            history: {
-              ...t.history,
-              events: [
-                ...t.history.events,
-                { name: event.name, timeStamp: renderCreationTime() },
-              ],
-            },
-          }
-        : t
-    );
+    const updatedTask = {
+      ...task,
+      timerState: {
+        ...task.timerState,
+        isActive: true,
+        createdAt: renderCreationTime(),
+        endsAt: targetDate.toLocaleString(),
+        remainingTime: totalSeconds,
+      },
+      history: {
+        ...task.history,
+        events: [
+          ...task.history.events,
+          { name: event.name, timeStamp: renderCreationTime() },
+        ],
+      },
+    };
+    const updatedTasks = tasks.map((t) => (t.id === task.id ? updatedTask : t));
     setTasks(updatedTasks);
-    localStorage.setItem("tasks", JSON.stringify(updatedTasks));
     createNotification(`Timer Set for ${timeLeft.map((t) => t.toString())}`);
     let timeOut = setTimeout(() => {
       const updatedTasks = tasks.map((t) =>
@@ -373,23 +374,20 @@ const useTasks = () => {
   });
 
   const handlePriority = useCallback((task, priority, event) => {
-    const updatedTasks = tasks.map((t) =>
-      t.id === task.id
-        ? {
-            ...t,
-            priority: priority,
-            history: {
-              ...t.history,
-              events: [
-                ...t.history.events,
-                { name: event.name, timeStamp: renderCreationTime() },
-              ],
-            },
-          }
-        : t
-    );
+    const updatedTask = {
+      ...task,
+      priority: priority,
+      history: {
+        ...task.history,
+        events: [
+          ...task.history.events,
+          { name: event.name, timeStamp: renderCreationTime() },
+        ],
+      },
+    };
+    const updatedTasks = tasks.map((t) => (t.id === task.id ? updatedTask : t));
     setTasks(updatedTasks);
-    localStorage.setItem("tasks", JSON.stringify(updatedTasks));
+    updateDoc(doc(auth.database, "tasks", task?.id), updatedTask);
   });
 
   return {

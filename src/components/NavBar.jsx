@@ -17,6 +17,9 @@ const NavBar = () => {
           <li>
             <NavLink to="/tasks/high">High Priority Tasks</NavLink>
           </li>
+          <li>
+            <NavLink to="/newTasks">Refactor</NavLink>
+          </li>
         </ul>
         <ul className="user-routes">
           {/* {

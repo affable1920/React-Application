@@ -6,7 +6,7 @@ const Pagination = () => {
   const context = useContext(TaskContext);
   const { currentPage, pageSize, tasks, onPageChange } = context;
 
-  const pagesCount = Math.ceil(tasks.length / pageSize);
+  const pagesCount = Math.ceil(tasks?.length / pageSize);
   if (pagesCount === 1) return null;
 
   const pages = [];

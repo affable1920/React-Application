@@ -2,18 +2,27 @@ import React, { useContext, useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import TaskContext from "../context/taskContext";
 import UserContext from "./../context/UserContext";
-import { RxCross2 } from "react-icons/rx";
 import TaskTable from "./common/TaskTable";
 import Filter from "../components/Filter";
 import SearchBar from "./SearchBar";
 import Pagination from "./Pagination";
 import ResetButton from "./ResetButton";
 import ResetTimersBtn from "./ResetTimersBtn";
-import { LuMenu } from "react-icons/lu";
 import AdminModal from "./AdminModal";
+import { RxCross2 } from "react-icons/rx";
+import { LuMenu } from "react-icons/lu";
+import { FaSortUp } from "react-icons/fa6";
 
-const Tasks = ({ onReset }) => {
-  const { user, data: tasks } = useContext(TaskContext);
+const Tasks = ({
+  onReset,
+  onSelectQuery,
+  onSort,
+  pages,
+  onLoad,
+  hasNextPage,
+  isFetchingNextPage,
+}) => {
+  const { user } = useContext(TaskContext);
   const { user: currentUser } = useContext(UserContext);
 
   const ifUserIsAdmin = currentUser && currentUser.userInfo.role === "Admin";
@@ -48,6 +57,11 @@ const Tasks = ({ onReset }) => {
     setshowAdminLinks((prev) => !prev);
   }
 
+  const constraints = [
+    { id: 1, label: "Relevance" },
+    { id: 2, label: "Date Added" },
+  ];
+
   return (
     <>
       {!currentUser && (
@@ -69,18 +83,42 @@ const Tasks = ({ onReset }) => {
           <Filter />
           <ResetButton onReset={onReset} />
           {user && <ResetTimersBtn />}
+          <div className="sorters">
+            <div className="sort-select">
+              <select
+                name="order"
+                onChange={(e) => onSelectQuery(e.target.value)}
+                className="form-select"
+              >
+                {constraints.map((c) => (
+                  <option value={c.label} key={c.id}>
+                    {c.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <FaSortUp onClick={onSort} className="sort-btn" />
+          </div>
         </div>
       </section>
       <section className="tasks">
-        <TaskTable onReset={onReset} />
-        <Pagination />
-        {user && (
-          <NavLink to="/add">
-            <button id="add-task-btn" className="btn btn-primary">
-              Add a task Right Now ?
-            </button>
-          </NavLink>
-        )}
+        <TaskTable pages={pages} onReset={onReset} />
+        <div className="task-footer-btns">
+          {user && (
+            <NavLink to="/add">
+              <button id="add-task-btn" className="btn btn-primary">
+                Add a task Right Now ?
+              </button>
+            </NavLink>
+          )}
+          <button
+            disabled={!hasNextPage || isFetchingNextPage}
+            onClick={onLoad}
+            className="btn btn-primary btn-load"
+          >
+            {isFetchingNextPage ? "Loading..." : "Load More"}
+          </button>
+        </div>
       </section>
     </>
   );

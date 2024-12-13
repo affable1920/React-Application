@@ -7,7 +7,7 @@ const Filter = () => {
   return (
     <button
       onClick={onStatusChange}
-      disabled={tasks.length === 0}
+      disabled={tasks?.length === 0}
       className="btn btn-warning"
       id="button"
     >

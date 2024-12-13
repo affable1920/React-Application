@@ -1,13 +1,10 @@
-import React, { useContext } from "react";
-import TaskContext from "../../context/taskContext";
+import React from "react";
 import TaskRow from "../TaskRow";
 
-const TableBody = () => {
-  const { paginatedTasks } = useContext(TaskContext);
-
+const TableBody = ({ page: tasks }) => {
   return (
     <section className="tasks-body">
-      {paginatedTasks.map((task) => (
+      {tasks?.map((task) => (
         <TaskRow key={task.id} task={task} />
       ))}
     </section>

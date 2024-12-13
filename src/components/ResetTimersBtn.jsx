@@ -4,12 +4,12 @@ import TaskContext from "../context/taskContext";
 const ResetTimersBtn = () => {
   const { tasks, onTimerReset } = useContext(TaskContext);
 
-  const tasksWithTimerOn = tasks.filter(
+  const tasksWithTimerOn = tasks?.filter(
     ({ timerState }) => timerState.isActive === true
   );
   return (
     <button
-      disabled={tasksWithTimerOn.length === 0}
+      disabled={tasksWithTimerOn?.length === 0}
       onClick={() => onTimerReset({ name: "Timer Reset for all tasks" })}
       className="btn btn-danger"
     >

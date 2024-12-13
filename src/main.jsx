@@ -10,7 +10,6 @@ import "./index.css";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 10 * 1000,
       retry: 5,
       cacheTime: 600_000,
     },
