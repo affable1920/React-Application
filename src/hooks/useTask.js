@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import { toast } from "react-toastify";
 import paginate from "./../services/paginate";
 import { months } from "../services/date-timer-service";
-import { deleteDoc, doc, setDoc, updateDoc } from "firebase/firestore";
+import { deleteDoc, doc, updateDoc } from "firebase/firestore";
 import auth from "../services/auth";
 
 const useTasks = () => {
@@ -14,21 +14,7 @@ const useTasks = () => {
   const [currentTask, setCurrentTask] = useState(null);
 
   const tns = "Timer Not Set";
-  const timerState = {
-    isActive: false,
-    createdAt: "Timer Not Set",
-    remainingTime: "Timer Not Set",
-    endsAt: "Timer Not Set",
-  };
-  const history = {
-    events: [],
-  };
-  const taskKeys = {
-    id: Date.now().toString(),
-    completed: false,
-    timerState,
-    history,
-  };
+
   const status = {
     completed: "Finished",
     notCompleted: "Not Finished",
@@ -104,19 +90,7 @@ const useTasks = () => {
     }
   };
 
-  const handleTaskAdd = (data, event) => {
-    const taskToAdd = {
-      ...data,
-      ...taskKeys,
-      history: {
-        ...history,
-        creation: { name: event.name, timeStamp: renderCreationTime() },
-      },
-    };
-    const newTasks = [...tasks, { ...taskToAdd }];
-    setTasks(newTasks);
-    setDoc(doc(auth.database, "tasks", taskToAdd.id), taskToAdd);
-  };
+  const handleTaskAdd = (data, event) => {};
 
   const handleChecBoxChange = useCallback((e, task) => {
     const updatedTasks = tasks.map((t) =>

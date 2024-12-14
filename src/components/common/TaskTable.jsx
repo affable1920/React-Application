@@ -4,9 +4,9 @@ import TableBody from "./TableBody";
 const TaskTable = ({ pages }) => {
   return (
     <>
-      {pages?.map((page) => (
+      {pages?.map(({ tasks }) => (
         <React.Fragment>
-          <TableBody page={page} />
+          <TableBody tasks={tasks} />
         </React.Fragment>
       ))}
     </>

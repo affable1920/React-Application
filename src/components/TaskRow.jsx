@@ -18,6 +18,7 @@ import {
   MdCheckBoxOutlineBlank,
   MdDelete,
 } from "react-icons/md";
+import UserContext from "../context/UserContext";
 
 const TaskRow = ({ task }) => {
   const { id, title, completed, description, category, priority, timerState } =
@@ -33,8 +34,8 @@ const TaskRow = ({ task }) => {
     onTimerClick,
     currentTask,
     handlePriority,
-    user,
   } = useContext(TaskContext);
+  const { user } = useContext(UserContext);
 
   const renderPriorityIcon = () => {
     if (priority.toLowerCase() === "high") return <FcHighPriority />;
@@ -51,13 +52,13 @@ const TaskRow = ({ task }) => {
   }
 
   useEffect(() => {
-    const endTime = new Date(timerState.endsAt);
+    const endTime = new Date(timerState?.endsAt);
     setInterval(() => {
       const now = Date.now();
       const timeLeft = (endTime.getTime() - now) / 1000;
       timeLeft <= 86400 && setShowTimer(true);
     }, 1000);
-  }, [timerState.endsAt]);
+  }, [timerState?.endsAt]);
 
   return (
     <>
@@ -84,7 +85,7 @@ const TaskRow = ({ task }) => {
             <span>{category}</span>
           </div>
           <div className="task-timer">
-            {!completed && timerState.isActive ? (
+            {!completed && timerState?.isActive ? (
               <IoNotificationsSharp onClick={() => onTimerClick(id)} />
             ) : (
               <IoNotificationsOutline onClick={() => onTimerClick(id)} />

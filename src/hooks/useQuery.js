@@ -5,7 +5,7 @@ import {
   limit,
   orderBy,
   query,
-  startAt,
+  startAfter,
 } from "firebase/firestore";
 import auth from "../services/auth";
 
@@ -14,17 +14,22 @@ const useCustomQuery = ({ pageSize }) => {
     queryKey: ["tasks"],
     queryFn: async ({ pageParam }) => {
       const tasksRef = collection(auth.database, "tasks");
-      let queryArray = [orderBy("id"), limit(pageSize || 8)];
+      let queryArray = [orderBy("timeStamp", "desc"), limit(pageSize)];
 
       const querySnap = pageParam
-        ? query(tasksRef, ...queryArray, startAt(pageParam))
+        ? query(tasksRef, ...queryArray, startAfter(pageParam))
         : query(tasksRef, ...queryArray);
       const docSnap = await getDocs(querySnap);
+      const tasks = docSnap.docs.map((doc) => doc.data());
+      const lastVisible = docSnap.docs[docSnap.docs.length - 1];
 
-      return docSnap.docs.map((doc) => doc.data());
+      return { tasks, lastVisible };
     },
-    getNextPageParam: (lastPage, allPages) =>
-      lastPage.length !== 0 ? allPages.length + 1 : undefined,
+    getNextPageParam: (lastPage) => {
+      return lastPage.tasks.length < pageSize
+        ? undefined
+        : lastPage.lastVisible;
+    },
   });
 };
 

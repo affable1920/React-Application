@@ -171,7 +171,6 @@ function App() {
             handleTimerCancel,
             handleCustomTimer,
             handlePriority,
-            user: currentUser,
           }}
         >
           <main>

@@ -1,11 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
-import TaskContext from "../context/taskContext";
 import UserContext from "./../context/UserContext";
 import TaskTable from "./common/TaskTable";
 import Filter from "../components/Filter";
 import SearchBar from "./SearchBar";
-import Pagination from "./Pagination";
 import ResetButton from "./ResetButton";
 import ResetTimersBtn from "./ResetTimersBtn";
 import AdminModal from "./AdminModal";
@@ -22,15 +20,12 @@ const Tasks = ({
   hasNextPage,
   isFetchingNextPage,
 }) => {
-  const { user } = useContext(TaskContext);
-  const { user: currentUser } = useContext(UserContext);
+  const { user } = useContext(UserContext);
 
-  const ifUserIsAdmin = currentUser && currentUser.userInfo.role === "Admin";
+  const ifUserIsAdmin = user && user.userInfo.role === "Admin";
 
   const [userIsAdmin, setUserIsAdmin] = useState(ifUserIsAdmin);
-  const [showAdminLinks, setshowAdminLinks] = useState(
-    currentUser?.role === "Admin"
-  );
+  const [showAdminLinks, setshowAdminLinks] = useState(user?.role === "Admin");
 
   useEffect(() => {
     setUserIsAdmin(ifUserIsAdmin);
@@ -64,7 +59,7 @@ const Tasks = ({
 
   return (
     <>
-      {!currentUser && (
+      {!user && (
         <div className="alert-box">
           <div className="alert-box-body">
             <NavLink to="/login">Login to access all features !</NavLink>

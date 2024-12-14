@@ -1,7 +1,7 @@
 import React from "react";
 import TaskRow from "../TaskRow";
 
-const TableBody = ({ page: tasks }) => {
+const TableBody = ({ tasks }) => {
   return (
     <section className="tasks-body">
       {tasks?.map((task) => (

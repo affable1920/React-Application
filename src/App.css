@@ -350,11 +350,10 @@ ul.user-routes {
 
 .task-footer-btns {
   position: absolute;
-  bottom: -2%;
+  bottom: -7.5%;
   display: flex;
   width: 100%;
   justify-content: space-between;
-  padding: 0 1.3rem;
 }
 
 .tasks-container {
@@ -622,7 +621,7 @@ ul.user-routes {
     margin-top: 0.5rem;
   }
   .task-footer-btns {
-    bottom: -7.5%;
+    bottom: -17.5%;
   }
 }
 
