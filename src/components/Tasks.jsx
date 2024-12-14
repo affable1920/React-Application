@@ -10,6 +10,7 @@ import AdminModal from "./AdminModal";
 import { RxCross2 } from "react-icons/rx";
 import { LuMenu } from "react-icons/lu";
 import { FaSortUp } from "react-icons/fa6";
+import AddComponent from "./AddComponent";
 
 const Tasks = ({
   onReset,
@@ -56,6 +57,7 @@ const Tasks = ({
     { id: 1, label: "Relevance" },
     { id: 2, label: "Date Added" },
   ];
+  console.log(window.innerWidth);
 
   return (
     <>
@@ -96,25 +98,27 @@ const Tasks = ({
           </div>
         </div>
       </section>
-      <section className="tasks">
-        <TaskTable pages={pages} onReset={onReset} />
-        <div className="task-footer-btns">
-          {user && (
-            <NavLink to="/add">
-              <button id="add-task-btn" className="btn btn-primary">
-                Add a task Right Now ?
-              </button>
-            </NavLink>
-          )}
-          <button
-            disabled={!hasNextPage || isFetchingNextPage}
-            onClick={onLoad}
-            className="btn btn-primary btn-load"
-          >
-            {isFetchingNextPage ? "Loading..." : "Load More"}
-          </button>
-        </div>
-      </section>
+      <div className="main-body">
+        <section className="tasks">
+          <TaskTable pages={pages} onReset={onReset} />
+          <div className="task-footer-btns">
+            {user && (
+              <NavLink to="/add">
+                <button id="add-task-btn" className="btn btn-primary">
+                  Add a task Right Now ?
+                </button>
+              </NavLink>
+            )}
+            <button
+              disabled={!hasNextPage || isFetchingNextPage}
+              onClick={onLoad}
+              className="btn btn-primary btn-load"
+            >
+              {isFetchingNextPage ? "Loading..." : "Load More"}
+            </button>
+          </div>
+        </section>
+      </div>
     </>
   );
 };

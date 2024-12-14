@@ -1,42 +1,14 @@
 import React, { useContext } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { joiResolver } from "@hookform/resolvers/joi/dist/joi.js";
 import Joi from "joi";
-import { addDoc, collection } from "firebase/firestore";
-import auth from "../services/auth";
 import UserContext from "./../context/UserContext";
 import Input from "./common/Input";
 import Select from "./common/Select";
+import useAddTasks from "../hooks/useAddTasks";
 
-const AddComponent = ({ onTaskAdd }) => {
-  const timerState = {
-    isActive: false,
-    createdAt: "Timer Not Set",
-    remainingTime: "Timer Not Set",
-    endsAt: "Timer Not Set",
-  };
-  const history = {
-    events: [],
-  };
-  const taskKeys = {
-    timeStamp: new Date(),
-    completed: false,
-    timerState,
-    history,
-  };
-
-  const queryClient = useQueryClient();
-
-  const { data, error, isLoading, mutate } = useMutation({
-    mutationKey: ["tasks"],
-    mutationFn: (newTask) => {
-      addDoc(collection(auth.database, "tasks"), {
-        ...newTask,
-        ...taskKeys,
-      });
-    },
-  });
+const AddComponent = () => {
+  const { data, mutate, error, isLoading } = useAddTasks();
 
   const { user } = useContext(UserContext);
   const categories = [
@@ -74,7 +46,7 @@ const AddComponent = ({ onTaskAdd }) => {
         mutate(data);
         reset();
       })}
-      className="mt-4"
+      className="mt-4 add-task-form"
     >
       <Input name="title" label="Title" register={register} errors={errors} />
       <Input
