@@ -5,7 +5,6 @@ import { onAuthStateChanged } from "firebase/auth";
 import { getDoc, doc } from "firebase/firestore";
 import useCustomQuery from "./hooks/useQuery";
 import auth from "./services/auth";
-import useTasks from "./hooks/useTask";
 import TaskContext from "./context/taskContext";
 import UserContext from "./context/UserContext";
 import AddComponent from "./components/AddComponent";
@@ -23,81 +22,29 @@ import "react-toastify/ReactToastify.css";
 import "./App.css";
 
 function App() {
-  const {
-    currentPage,
-    pageSize,
-    selectedStatus,
-    searchQuery,
-    currentTask,
-    handleTaskAdd,
-    handleChecBoxChange,
-    handleDelete,
-    handlePageChange,
-    setSearchQuery,
-    handleStatus,
-    handleReset,
-    handleTimerClick,
-    handleTimer,
-    handleTimerCancel,
-    resetTimers,
-    handleCustomTimer,
-    handlePriority,
-  } = useTasks();
-
+  const [pageSize, setPageSize] = useState(7);
   const [query, setQuery] = useState({ pageSize });
 
-  const {
-    data,
-    error,
-    isLoading,
-    refetch,
-    fetchNextPage,
-    isFetchingNextPage,
-    hasNextPage,
-  } = useCustomQuery(query);
+  const { data, fetchNextPage, isFetchingNextPage, hasNextPage } =
+    useCustomQuery(query);
 
-  let unfinishedTasksMessage =
-    "You have some unifinished tasks that are older than a week !";
-  let highPriorityTasksMessage =
-    "Some high priority tasks need your attention !";
-  let generalAlert = "You have pending tasks !";
+  useEffect(() => {
+    const updatedPageSize = () => {
+      setPageSize(window.innerWidth < 768 ? 7 : 16);
+    };
 
-  const isOlderThanAWeek = (timeStamp) => {
-    const creationTime = new Date(timeStamp);
-    const now = new Date();
-    const ms = now.getTime() - creationTime.getTime();
-    const daysPassed = ms / (1000 * 60 * 60 * 24);
-    return daysPassed >= 7;
-  };
-
-  // const unfinishedTasks = tasks?.filter(
-  //   ({ completed, history }) =>
-  //     completed === false &&
-  //     isOlderThanAWeek(
-  //       `${history?.creation?.timeStamp}${new Date().getFullYear()}`
-  //     )
-  // );
-  // const highPriorityTasks = tasks?.filter(
-  //   (task) => task.priority.toLowerCase() === "high"
-  // );
+    updatedPageSize();
+    window.addEventListener("resize", updatedPageSize);
+    window.addEventListener("visibilitychange", updatedPageSize);
+    return () => {
+      window.removeEventListener("resize", updatedPageSize);
+      window.removeEventListener("visibilitychange", updatedPageSize);
+    };
+  }, [window.innerWidth]);
 
   const [currentUser, setCurrentUser] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const [portalMessage, setPortalMessage] = useState("");
-
-  // useEffect(() => {
-  //   let message = "";
-  //   if (unfinishedTasks?.length !== 0) message = unfinishedTasksMessage;
-  //   if (highPriorityTasks?.length !== 0) message = highPriorityTasksMessage;
-  //   if (highPriorityTasks?.length !== 0 && unfinishedTasks?.length !== 0)
-  //     message = generalAlert;
-
-  //   if (message) {
-  //     setIsOpen(true);
-  //     setPortalMessage(message);
-  //     localStorage.setItem("modalIsOpen", true);
-  //   }
-  // }, []);
 
   useEffect(() => {
     const cleanUp = onAuthStateChanged(auth.authInstance, async (user) => {
@@ -114,31 +61,8 @@ function App() {
     });
   }, []);
 
-  const handleClose = () => {
-    setIsOpen(false);
-    localStorage.setItem("modalIsOpen", false);
-    setPortalMessage("");
-  };
-
-  // const renderAlertTasks = () => {
-  //   let tasksToRender = [];
-
-  //   if (unfinishedTasks?.length > 0) tasksToRender = unfinishedTasks;
-  //   if (highPriorityTasks?.length > 0) tasksToRender = highPriorityTasks;
-  //   if (highPriorityTasks?.length > 0 && unfinishedTasks.length > 0) {
-  //     const combinedTasks = [...highPriorityTasks, ...unfinishedTasks];
-  //     tasksToRender = combinedTasks?.filter(
-  //       (task, index, self) =>
-  //         index === self.findIndex((t) => t.id === task?.id)
-  //     );
-  //   }
-  //   return tasksToRender;
-  // };
-
-  const setQueryPriority = () => {
-    if (!query.priority || query?.priority === "Low")
-      setQuery({ ...query, priority: "High" });
-    else setQuery({ ...query, priority: "Low" });
+  const setQuerySearchString = (searchString) => {
+    setQuery({ ...query, searchString });
   };
 
   return (
@@ -154,42 +78,18 @@ function App() {
         <NavBar />
         <TaskContext.Provider
           value={{
-            currentPage,
             pageSize,
-            status: selectedStatus,
-            searchQuery,
-            currentTask,
-            onAddTask: handleTaskAdd,
-            onCheckBoxChange: handleChecBoxChange,
-            onDelete: handleDelete,
-            onPageChange: handlePageChange,
-            setSearchQuery,
-            onStatusChange: handleStatus,
-            onTimerClick: handleTimerClick,
-            onTimerReset: resetTimers,
-            handleTimer,
-            handleTimerCancel,
-            handleCustomTimer,
-            handlePriority,
+            setQuerySearchString,
           }}
         >
           <main>
             <Routes>
-              <Route
-                path="/add"
-                element={<AddComponent onTaskAdd={handleTaskAdd} />}
-              />
+              <Route path="/add" element={<AddComponent />} />
               <Route
                 path="/"
                 exact
                 element={
                   <Tasks
-                    onSort={setQueryPriority}
-                    constraint={query}
-                    onSelectQuery={(c) => {
-                      setQuery({ ...query, [c]: c });
-                    }}
-                    onReset={handleReset}
                     pages={data?.pages}
                     onLoad={fetchNextPage}
                     isFetchingNextPage={isFetchingNextPage}

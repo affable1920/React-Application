@@ -9,7 +9,6 @@ import { IoNotificationsSharp } from "react-icons/io5";
 import { FcHighPriority } from "react-icons/fc";
 import { FcLowPriority } from "react-icons/fc";
 import { FcMediumPriority } from "react-icons/fc";
-import { IoIosArrowDropdown } from "react-icons/io";
 import { IoMdMore } from "react-icons/io";
 import {
   MdArchive,
@@ -19,6 +18,7 @@ import {
   MdDelete,
 } from "react-icons/md";
 import UserContext from "../context/UserContext";
+import auth from "../services/auth";
 
 const TaskRow = ({ task }) => {
   const { id, title, completed, description, category, priority, timerState } =
@@ -28,13 +28,7 @@ const TaskRow = ({ task }) => {
   const [showTooltip, setShowTooltip] = useState(false);
   const [showTimer, setShowTimer] = useState(false);
   const [showTagline, setShowTagline] = useState(false);
-  const {
-    onCheckBoxChange,
-    onDelete,
-    onTimerClick,
-    currentTask,
-    handlePriority,
-  } = useContext(TaskContext);
+  const { onTimerClick, currentTask, handlePriority } = useContext(TaskContext);
   const { user } = useContext(UserContext);
 
   const renderPriorityIcon = () => {
@@ -116,11 +110,7 @@ const TaskRow = ({ task }) => {
               task={task}
             />
           </div>
-          {
-            <button onClick={() => onDelete(task)} className="btn btn-danger">
-              Delete
-            </button>
-          }
+          {<button className="btn btn-danger">Delete</button>}
           <IoMdMore
             onClick={() => setLoadMore(!loadMore)}
             className="load-more-icon"

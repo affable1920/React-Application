@@ -1,14 +1,13 @@
 import React, { useContext } from "react";
-import { useNavigate, useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import TaskContext from "./../context/taskContext";
 import TimePicker from "./TimePicker";
 
 const TaskComponent = () => {
-  const navigate = useNavigate();
   const { state: task } = useLocation();
   const params = useParams();
 
-  const { history, timerState, completed } = task;
+  const { history, timerState } = task;
   const { events } = history;
   const { onTimerClick, currentTask } = useContext(TaskContext);
   console.log(task);

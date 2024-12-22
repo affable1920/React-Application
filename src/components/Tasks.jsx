@@ -10,17 +10,8 @@ import AdminModal from "./AdminModal";
 import { RxCross2 } from "react-icons/rx";
 import { LuMenu } from "react-icons/lu";
 import { FaSortUp } from "react-icons/fa6";
-import AddComponent from "./AddComponent";
 
-const Tasks = ({
-  onReset,
-  onSelectQuery,
-  onSort,
-  pages,
-  onLoad,
-  hasNextPage,
-  isFetchingNextPage,
-}) => {
+const Tasks = ({ onReset, pages, onLoad, hasNextPage, isFetchingNextPage }) => {
   const { user } = useContext(UserContext);
 
   const ifUserIsAdmin = user && user.userInfo.role === "Admin";
@@ -53,12 +44,6 @@ const Tasks = ({
     setshowAdminLinks((prev) => !prev);
   }
 
-  const constraints = [
-    { id: 1, label: "Relevance" },
-    { id: 2, label: "Date Added" },
-  ];
-  console.log(window.innerWidth);
-
   return (
     <>
       {!user && (
@@ -80,22 +65,7 @@ const Tasks = ({
           <Filter />
           <ResetButton onReset={onReset} />
           {user && <ResetTimersBtn />}
-          <div className="sorters">
-            <div className="sort-select">
-              <select
-                name="order"
-                onChange={(e) => onSelectQuery(e.target.value)}
-                className="form-select"
-              >
-                {constraints.map((c) => (
-                  <option value={c.label} key={c.id}>
-                    {c.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <FaSortUp onClick={onSort} className="sort-btn" />
-          </div>
+          <FaSortUp className="sort-btn" />
         </div>
       </section>
       <div className="main-body">

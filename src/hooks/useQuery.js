@@ -26,10 +26,11 @@ const useCustomQuery = ({ pageSize }) => {
       return { tasks, lastVisible };
     },
     getNextPageParam: (lastPage) => {
-      return lastPage.tasks.length < pageSize
+      return lastPage.tasks.length < pageSize || !lastPage.lastVisible
         ? undefined
         : lastPage.lastVisible;
     },
+    keepPreviousData: true,
   });
 };
 

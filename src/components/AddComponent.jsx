@@ -8,7 +8,7 @@ import Select from "./common/Select";
 import useAddTasks from "../hooks/useAddTasks";
 
 const AddComponent = () => {
-  const { data, mutate, error, isLoading } = useAddTasks();
+  const { mutate } = useAddTasks();
 
   const { user } = useContext(UserContext);
   const categories = [

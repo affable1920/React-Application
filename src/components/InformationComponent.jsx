@@ -1,9 +1,7 @@
-import React, { useContext } from "react";
+import React from "react";
 import { NavLink } from "react-router-dom";
-import TaskContext from "../context/taskContext";
 
 const InformationComponent = ({ tasks, alertTasks }) => {
-  const { user } = useContext(TaskContext);
   return (
     <footer id="footer">
       <section id="info-component">
@@ -12,16 +10,6 @@ const InformationComponent = ({ tasks, alertTasks }) => {
             ? `No Active Tasks`
             : `${tasks.length} Active Tasks`}
         </span>
-        {/* {tasksWithTimer.length !== 0 && (
-          <span className="badge">{`${tasksWithTimer.length} Tasks have Active Timers`}</span>
-        )} */}
-        {/* {highPriorityTasks.length !== 0 && (
-          <div className="high-priority-tasks-info">
-            <NavLink>
-              {highPriorityTasks.length} tasks have High Priority.
-            </NavLink>
-          </div>
-        )} */}
         {alertTasks.length !== 0 && (
           <div className="unfinished-tasks-info">
             <NavLink to="/tasks/unfinished">

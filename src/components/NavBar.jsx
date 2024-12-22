@@ -14,19 +14,13 @@ const NavBar = () => {
           <li>
             <NavLink to="/">Tasks</NavLink>
           </li>
-          <li>
-            <NavLink to="/tasks/high">High Priority Tasks</NavLink>
-          </li>
-          <li>
-            <NavLink to="/newTasks">Refactor</NavLink>
-          </li>
+          {user && (
+            <li>
+              <NavLink to="/tasks/high">High Priority Tasks</NavLink>
+            </li>
+          )}
         </ul>
         <ul className="user-routes">
-          {/* {
-            <div id="theme-toggler-btn">
-              <button className="btn btn-dark">Toggle Theme</button>
-            </div>
-          } */}
           {user && (
             <>
               <li

@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { QueryClient, useMutation } from "@tanstack/react-query";
 import { addDoc, collection } from "firebase/firestore";
 import auth from "../services/auth";
 
@@ -19,14 +19,15 @@ const useAddTasks = () => {
     history,
   };
 
+  const queryClient = new QueryClient();
+
   return useMutation({
     mutationKey: ["tasks"],
-    mutationFn: (newTask) => {
+    mutationFn: (newTask) =>
       addDoc(collection(auth.database, "tasks"), {
         ...newTask,
         ...taskKeys,
-      });
-    },
+      }),
   });
 };
 
