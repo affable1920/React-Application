@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 import UserContext from "../context/UserContext";
 
 const NavBar = () => {
-  const { user } = useContext(UserContext);
+  const { currentUser } = useContext(UserContext);
   return (
     <header id="page-header">
       <nav id="nav-bar">
@@ -14,22 +14,17 @@ const NavBar = () => {
           <li>
             <NavLink to="/">Tasks</NavLink>
           </li>
-          {user && (
-            <li>
-              <NavLink to="/tasks/high">High Priority Tasks</NavLink>
-            </li>
-          )}
         </ul>
         <ul className="user-routes">
-          {user && (
+          {currentUser && (
             <>
               <li
                 style={{ textTransform: "capitalize", letterSpacing: ".6px" }}
               >
-                {!user.displayName ? (
+                {!currentUser.displayName ? (
                   <p>Logging you In ...</p>
                 ) : (
-                  <NavLink to="profile">{user.displayName}</NavLink>
+                  <NavLink to="profile">{currentUser.displayName}</NavLink>
                 )}
               </li>
               <li>
@@ -37,7 +32,7 @@ const NavBar = () => {
               </li>
             </>
           )}
-          {!user && (
+          {!currentUser && (
             <>
               <li>
                 <NavLink to="/login">Login</NavLink>

@@ -1,6 +1,5 @@
-import React, { useContext } from "react";
+import React from "react";
 import { useLocation, useParams } from "react-router-dom";
-import TaskContext from "./../context/taskContext";
 import TimePicker from "./TimePicker";
 
 const TaskComponent = () => {
@@ -9,8 +8,6 @@ const TaskComponent = () => {
 
   const { history, timerState } = task;
   const { events } = history;
-  const { onTimerClick, currentTask } = useContext(TaskContext);
-  console.log(task);
 
   return (
     <div id="task-component">

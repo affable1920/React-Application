@@ -7,38 +7,22 @@ import SearchBar from "./SearchBar";
 import ResetButton from "./ResetButton";
 import ResetTimersBtn from "./ResetTimersBtn";
 import AdminModal from "./AdminModal";
-import { RxCross2 } from "react-icons/rx";
 import { LuMenu } from "react-icons/lu";
 import { FaSortUp } from "react-icons/fa6";
 
 const Tasks = ({ onReset, pages, onLoad, hasNextPage, isFetchingNextPage }) => {
-  const { user } = useContext(UserContext);
+  const { currentUser } = useContext(UserContext);
 
-  const ifUserIsAdmin = user && user.userInfo.role === "Admin";
+  const ifUserIsAdmin = currentUser && currentUser.userInfo.role === "Admin";
 
   const [userIsAdmin, setUserIsAdmin] = useState(ifUserIsAdmin);
-  const [showAdminLinks, setshowAdminLinks] = useState(user?.role === "Admin");
+  const [showAdminLinks, setshowAdminLinks] = useState(
+    currentUser?.role === "Admin"
+  );
 
   useEffect(() => {
     setUserIsAdmin(ifUserIsAdmin);
   }, [ifUserIsAdmin]);
-
-  // const tasksWithLowTimeLeft = tasks.filter(
-  //   ({ timerState }) =>
-  //     timerState?.remainingTime > 0 && timerState?.remainingTime < 86400
-  // );
-
-  const renderAlertBox = () => {
-    return (
-      <div className="low-timer-alert">
-        <div className="low-timer-alert-header">
-          <RxCross2 style={{ cursor: "pointer" }} />
-          <p>Timers for some tasks ending soon !</p>
-        </div>
-        <button className="btn btn-danger">Check these out</button>
-      </div>
-    );
-  };
 
   function handleAdminBarVisibility() {
     setshowAdminLinks((prev) => !prev);
@@ -46,11 +30,11 @@ const Tasks = ({ onReset, pages, onLoad, hasNextPage, isFetchingNextPage }) => {
 
   return (
     <>
-      {!user && (
-        <div className="alert-box">
-          <div className="alert-box-body">
-            <NavLink to="/login">Login to access all features !</NavLink>
-          </div>
+      {!currentUser && (
+        <div className="bg-red-800 text-center text-sm text-white font-semibold ">
+          <NavLink className="cursor-pointer" to="/login">
+            Login to access all features !
+          </NavLink>
         </div>
       )}
       <section className="flex-nav">
@@ -64,7 +48,7 @@ const Tasks = ({ onReset, pages, onLoad, hasNextPage, isFetchingNextPage }) => {
         <div className="task-buttons">
           <Filter />
           <ResetButton onReset={onReset} />
-          {user && <ResetTimersBtn />}
+          {currentUser && <ResetTimersBtn />}
           <FaSortUp className="sort-btn" />
         </div>
       </section>
@@ -72,7 +56,7 @@ const Tasks = ({ onReset, pages, onLoad, hasNextPage, isFetchingNextPage }) => {
         <section className="tasks">
           <TaskTable pages={pages} onReset={onReset} />
           <div className="task-footer-btns">
-            {user && (
+            {currentUser && (
               <NavLink to="/add">
                 <button id="add-task-btn" className="btn btn-primary">
                   Add a task Right Now ?

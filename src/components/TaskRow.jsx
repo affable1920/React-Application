@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
-import TaskContext from "../context/taskContext";
 import TimePicker from "./TimePicker";
 import Timer from "./Timer";
 import Levels from "./Levels";
@@ -18,27 +17,19 @@ import {
   MdDelete,
 } from "react-icons/md";
 import UserContext from "../context/UserContext";
-import auth from "../services/auth";
 
 const TaskRow = ({ task }) => {
   const { id, title, completed, description, category, priority, timerState } =
     task;
+  const { user } = useContext(UserContext);
 
   const [loadMore, setLoadMore] = useState(false);
-  const [showTooltip, setShowTooltip] = useState(false);
-  const [showTimer, setShowTimer] = useState(false);
   const [showTagline, setShowTagline] = useState(false);
-  const { onTimerClick, currentTask, handlePriority } = useContext(TaskContext);
-  const { user } = useContext(UserContext);
 
   const renderPriorityIcon = () => {
     if (priority.toLowerCase() === "high") return <FcHighPriority />;
     if (priority.toLowerCase() === "medium") return <FcMediumPriority />;
     if (priority.toLowerCase() === "low") return <FcLowPriority />;
-  };
-
-  const handleTooltipClose = () => {
-    setShowTooltip(false);
   };
 
   function handleTaglineToggle() {
@@ -84,31 +75,14 @@ const TaskRow = ({ task }) => {
             ) : (
               <IoNotificationsOutline onClick={() => onTimerClick(id)} />
             )}
-            {task === currentTask ? (
-              <TimePicker taskIsActive={timerState.isActive} task={task} />
-            ) : null}
           </div>
         </div>
         <div className="task-row-btns">
-          <button
-            disabled={!user}
-            onClick={() => {
-              setShowTooltip(!showTooltip);
-              setTimeout(() => {
-                setShowTooltip(false);
-              }, 5000);
-            }}
-            className="btn btn-secondary priority-btn"
-          >
+          <button disabled={!user} className="btn btn-secondary priority-btn">
             {priority ? "Change Priority" : "Set Priority"}
           </button>
           <div className="priority-cell">
-            <Levels
-              showTooltip={showTooltip}
-              onClose={handleTooltipClose}
-              onPriorityClick={handlePriority}
-              task={task}
-            />
+            <Levels task={task} />
           </div>
           {<button className="btn btn-danger">Delete</button>}
           <IoMdMore
@@ -132,11 +106,9 @@ const TaskRow = ({ task }) => {
               </button>
             </div>
           )}
-          {showTimer && (
-            <div>
-              <Timer timerState={timerState} />
-            </div>
-          )}
+          <div>
+            <Timer timerState={timerState} />
+          </div>
         </div>
       </div>
     </>

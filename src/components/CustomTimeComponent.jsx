@@ -1,9 +1,7 @@
-import React, { useContext, useRef } from "react";
-import TaskContext from "../context/taskContext";
+import React, { useRef } from "react";
 
 const CustomTimeComponent = ({ task }) => {
   const ref = useRef(null);
-  const { handleCustomTimer } = useContext(TaskContext);
 
   return (
     <form>
